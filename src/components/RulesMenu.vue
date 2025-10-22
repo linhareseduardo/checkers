@@ -1,88 +1,160 @@
 <template>
   <div class="rules-menu-overlay">
     <div class="rules-menu">
-      <h1 class="menu-title">🎯 Escolha as Regras do Jogo</h1>
+      <h1 class="menu-title">
+        <span class="title-icon">🎯</span>
+        {{ t('chooseRules') }}
+        <div class="title-flags">
+          <span 
+            class="title-flag flag-br" 
+            :class="{ 'active': currentLang === 'pt' }"
+            @click="changeLang('pt')"
+            title="Português"
+          >PT</span>
+          <span 
+            class="title-flag flag-us" 
+            :class="{ 'active': currentLang === 'en' }"
+            @click="changeLang('en')"
+            title="English"
+          >EN</span>
+          <span 
+            class="title-flag flag-es" 
+            :class="{ 'active': currentLang === 'es' }"
+            @click="changeLang('es')"
+            title="Español"
+          >ES</span>
+        </div>
+      </h1>
+      
+      <!-- Modo de Jogo -->
+      <div class="game-mode-section">
+        <h2 class="section-title">{{ t('gameMode') }}</h2>
+        <div class="mode-buttons">
+          <button 
+            class="mode-btn" 
+            :class="{ 'active': gameMode === 'pvp' }"
+            @click="gameMode = 'pvp'"
+          >
+            👥 {{ t('playerVsPlayer') }}
+          </button>
+          <button 
+            class="mode-btn" 
+            :class="{ 'active': gameMode === 'pvc' }"
+            @click="gameMode = 'pvc'"
+          >
+            🤖 {{ t('playerVsComputer') }}
+          </button>
+        </div>
+
+        <!-- Dificuldade da IA (apenas se modo PvC) -->
+        <div v-if="gameMode === 'pvc'" class="ai-difficulty">
+          <h3 class="difficulty-title">{{ t('aiDifficulty') }}</h3>
+          <div class="difficulty-buttons">
+            <button 
+              class="diff-btn easy"
+              :class="{ 'active': aiDifficulty === 'easy' }"
+              @click="aiDifficulty = 'easy'"
+            >
+              😊 {{ t('easy') }}
+            </button>
+            <button 
+              class="diff-btn medium"
+              :class="{ 'active': aiDifficulty === 'medium' }"
+              @click="aiDifficulty = 'medium'"
+            >
+              🤔 {{ t('medium') }}
+            </button>
+            <button 
+              class="diff-btn hard"
+              :class="{ 'active': aiDifficulty === 'hard' }"
+              @click="aiDifficulty = 'hard'"
+            >
+              😈 {{ t('hard') }}
+            </button>
+          </div>
+        </div>
+      </div>
       
       <div class="rules-grid">
         <!-- American Checkers -->
         <div class="rule-card american" @click="selectRules('american')">
           <div class="flag">🇺🇸</div>
-          <h2>American Checkers</h2>
+          <h2>{{ t('americanCheckers') }}</h2>
           
           <div class="rule-details">
             <div class="detail-item">
               <span class="icon">📐</span>
-              <span>Tabuleiro 8x8</span>
+              <span>{{ t('board') }} 8x8</span>
             </div>
             <div class="detail-item">
               <span class="icon">👑</span>
-              <span>Movimentos curtos</span>
+              <span>{{ t('shortMoves') }}</span>
             </div>
             <div class="detail-item">
               <span class="icon">⭕</span>
-              <span>Não captura para trás</span>
+              <span>{{ t('cannotCaptureBackwards') }}</span>
             </div>
             <div class="detail-item">
               <span class="icon">🎯</span>
-              <span>Captura livre</span>
+              <span>{{ t('captureFree') }}</span>
             </div>
           </div>
           
-          <button class="choose-btn">Escolher</button>
+          <button class="choose-btn">{{ t('choose') }}</button>
         </div>
 
         <!-- Brazilian Draughts -->
         <div class="rule-card brazilian" @click="selectRules('brazilian')">
           <div class="flag">🇧🇷</div>
-          <h2>Damas Brasileiras</h2>
+          <h2>{{ t('brazilianDraughts') }}</h2>
           
           <div class="rule-details">
             <div class="detail-item">
               <span class="icon">📐</span>
-              <span>Tabuleiro 8x8</span>
+              <span>{{ t('board') }} 8x8</span>
             </div>
             <div class="detail-item">
               <span class="icon">👑</span>
-              <span>Movimentos longos</span>
+              <span>{{ t('longMoves') }}</span>
             </div>
             <div class="detail-item">
               <span class="icon">✅</span>
-              <span>Captura para trás</span>
+              <span>{{ t('canCaptureBackwards') }}</span>
             </div>
             <div class="detail-item">
               <span class="icon">🎯</span>
-              <span>Captura máxima obrigatória</span>
+              <span>{{ t('mustCaptureMax') }}</span>
             </div>
           </div>
           
-          <button class="choose-btn">Escolher</button>
+          <button class="choose-btn">{{ t('choose') }}</button>
         </div>
 
         <!-- International Draughts -->
         <div class="rule-card international" @click="selectRules('international')">
           <div class="flag">🌍</div>
-          <h2>Damas Internacionais</h2>
+          <h2>{{ t('internationalDraughts') }}</h2>
           
           <div class="rule-details">
             <div class="detail-item">
               <span class="icon">📐</span>
-              <span>Tabuleiro 10x10</span>
+              <span>{{ t('board') }} 10x10</span>
             </div>
             <div class="detail-item">
               <span class="icon">👑</span>
-              <span>Movimentos longos</span>
+              <span>{{ t('longMoves') }}</span>
             </div>
             <div class="detail-item">
               <span class="icon">✅</span>
-              <span>Captura para trás</span>
+              <span>{{ t('canCaptureBackwards') }}</span>
             </div>
             <div class="detail-item">
               <span class="icon">🎯</span>
-              <span>Captura máxima obrigatória</span>
+              <span>{{ t('mustCaptureMax') }}</span>
             </div>
           </div>
           
-          <button class="choose-btn">Escolher</button>
+          <button class="choose-btn">{{ t('choose') }}</button>
         </div>
       </div>
     </div>
@@ -90,12 +162,50 @@
 </template>
 
 <script>
+import LanguageSelector from './LanguageSelector.vue';
+import { useTranslation } from '../i18n.js';
+
 export default {
   name: 'RulesMenu',
-  emits: ['select-rules'],
+  components: {
+    LanguageSelector
+  },
+  props: {
+    language: {
+      type: String,
+      default: 'pt'
+    }
+  },
+  emits: ['select-rules', 'change-language'],
+  data() {
+    return {
+      currentLang: this.language,
+      gameMode: 'pvp', // 'pvp' ou 'pvc'
+      aiDifficulty: 'medium', // 'easy', 'medium', 'hard'
+      languages: [
+        { code: 'pt', flag: '🇧🇷', name: 'Português' },
+        { code: 'en', flag: '🇺🇸', name: 'English' },
+        { code: 'es', flag: '🇪🇸', name: 'Español' }
+      ]
+    };
+  },
+  computed: {
+    t() {
+      const { t } = useTranslation(this.currentLang);
+      return t;
+    }
+  },
   methods: {
     selectRules(ruleType) {
-      this.$emit('select-rules', ruleType);
+      this.$emit('select-rules', {
+        ruleType,
+        gameMode: this.gameMode,
+        aiDifficulty: this.aiDifficulty
+      });
+    },
+    changeLang(lang) {
+      this.currentLang = lang;
+      this.$emit('change-language', lang);
     }
   }
 }
@@ -110,11 +220,13 @@ export default {
   bottom: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   padding: 20px;
   z-index: 2000;
   animation: fadeIn 0.3s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 @keyframes fadeIn {
@@ -125,14 +237,171 @@ export default {
 .rules-menu {
   max-width: 1200px;
   width: 100%;
+  margin: 0 auto;
+  position: relative;
 }
 
 .menu-title {
   text-align: center;
   color: white;
   font-size: 2.5em;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.title-icon {
+  font-size: 1.2em;
+}
+
+.title-flags {
+  display: flex;
+  gap: 15px;
+  font-size: 0.6em;
+}
+
+.title-flag {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.2em;
+  border: 2px solid transparent;
+}
+
+.title-flag.flag-br {
+  background: linear-gradient(135deg, #009c3b 0%, #ffdf00 100%);
+  color: #002776;
+}
+
+.title-flag.flag-us {
+  background: linear-gradient(135deg, #b22234 0%, #3c3b6e 100%);
+  color: white;
+}
+
+.title-flag.flag-es {
+  background: linear-gradient(135deg, #c60b1e 0%, #ffc400 100%);
+  color: #c60b1e;
+}
+
+.title-flag:hover {
+  transform: scale(1.25);
+  opacity: 1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.title-flag.active {
+  opacity: 1;
+  transform: scale(1.15);
+  border-color: white;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.game-mode-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.section-title {
+  text-align: center;
+  color: #4a3933;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.mode-btn {
+  flex: 1;
+  max-width: 300px;
+  padding: 15px 25px;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: 3px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #495057;
+}
+
+.mode-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.mode-btn.active {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  transform: scale(1.05);
+}
+
+.ai-difficulty {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.difficulty-title {
+  text-align: center;
+  color: #495057;
+  font-size: 1.2em;
+  margin-bottom: 15px;
+}
+
+.difficulty-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.diff-btn {
+  padding: 12px 20px;
+  font-size: 1em;
+  font-weight: bold;
+  border: 3px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  min-width: 120px;
+}
+
+.diff-btn.easy {
+  background: linear-gradient(135deg, #56ab2f, #a8e063);
+}
+
+.diff-btn.medium {
+  background: linear-gradient(135deg, #f09819, #ff512f);
+}
+
+.diff-btn.hard {
+  background: linear-gradient(135deg, #c31432, #240b36);
+}
+
+.diff-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.diff-btn.active {
+  border-color: white;
+  transform: scale(1.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
 .rules-grid {
@@ -255,6 +524,31 @@ export default {
 @media (max-width: 768px) {
   .menu-title {
     font-size: 1.8em;
+  }
+
+  .title-flags {
+    font-size: 0.5em;
+    gap: 10px;
+  }
+
+  .title-flag {
+    padding: 3px;
+  }
+
+  .mode-buttons {
+    flex-direction: column;
+  }
+
+  .mode-btn {
+    max-width: 100%;
+  }
+
+  .difficulty-buttons {
+    flex-direction: column;
+  }
+
+  .diff-btn {
+    width: 100%;
   }
 
   .rules-grid {

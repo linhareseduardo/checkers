@@ -1,30 +1,62 @@
 <template>
   <div class="app">
     <!-- Menu de Seleção de Regras -->
-    <RulesMenu v-if="!selectedRules" @select-rules="handleRulesSelection" />
+    <RulesMenu 
+      v-if="!selectedRules" 
+      :language="currentLanguage"
+      @select-rules="handleRulesSelection"
+      @change-language="handleLanguageChange"
+    />
 
     <div v-else class="game-container">
-      <h1 class="title">
-        🎯 Jogo de Damas
-        <span class="rule-badge">{{ getRuleName() }}</span>
-      </h1>
+      <!-- Seletor de Idioma no Jogo -->
+      <div class="game-header">
+        <h1 class="title">
+          <div class="title-main">
+            <span class="title-icon">🎯</span>
+            {{ t('checkersGame') }}
+            <div class="header-flags">
+              <span 
+                class="header-flag flag-br" 
+                :class="{ 'active': currentLanguage === 'pt' }"
+                @click="handleLanguageChange('pt')"
+                title="Português"
+              >PT</span>
+              <span 
+                class="header-flag flag-us" 
+                :class="{ 'active': currentLanguage === 'en' }"
+                @click="handleLanguageChange('en')"
+                title="English"
+              >EN</span>
+              <span 
+                class="header-flag flag-es" 
+                :class="{ 'active': currentLanguage === 'es' }"
+                @click="handleLanguageChange('es')"
+                title="Español"
+              >ES</span>
+            </div>
+          </div>
+          <span class="rule-badge">{{ getRuleName() }}</span>
+        </h1>
+      </div>
       
       <div class="game-info">
         <div class="player-turn">
           <div class="turn-indicator" :class="{ 'red': game.currentPlayer === 'red', 'black': game.currentPlayer === 'black' }">
             <span class="player-piece" :class="game.currentPlayer"></span>
-            <span>Vez do jogador {{ game.currentPlayer === 'red' ? 'Vermelho' : 'Preto' }}</span>
+            <span v-if="!isAITurn">{{ t('playerTurn') }} {{ game.currentPlayer === 'red' ? t('redPlayer') : t('blackPlayer') }}</span>
+            <span v-else>{{ t('computerTurn') }} {{ t('thinking') }}</span>
           </div>
         </div>
 
         <div class="score-board">
           <div class="score red">
             <span class="piece-icon red"></span>
-            <span>{{ redPieces }} peças</span>
+            <span>{{ redPieces }} {{ t('pieces') }}</span>
           </div>
           <div class="score black">
             <span class="piece-icon black"></span>
-            <span>{{ blackPieces }} peças</span>
+            <span>{{ blackPieces }} {{ t('pieces') }}</span>
           </div>
         </div>
       </div>
@@ -40,27 +72,27 @@
 
       <div class="controls">
         <button @click="resetGame" class="btn btn-reset">
-          🔄 Reiniciar Jogo
+          🔄 {{ t('resetGame') }}
         </button>
         <button @click="changeRules" class="btn btn-change">
-          ⚙️ Mudar Regras
+          ⚙️ {{ t('changeRules') }}
         </button>
       </div>
 
       <div class="instructions">
-        <h3>📜 Regras {{ getRuleName() }}:</h3>
+        <h3>📜 {{ t('rules') }} {{ getRuleName() }}:</h3>
         <ul>
-          <li>Clique em uma peça para selecioná-la</li>
-          <li>Clique em um quadrado verde para mover</li>
-          <li>Capture as peças do oponente pulando sobre elas</li>
-          <li v-if="selectedRules === 'american'">❌ Peças comuns não capturam para trás</li>
-          <li v-if="selectedRules !== 'american'">✅ Peças comuns podem capturar para trás</li>
-          <li v-if="selectedRules === 'american'">👑 Damas se movem apenas 1 casa</li>
-          <li v-if="selectedRules !== 'american'">👑 Damas se movem múltiplas casas</li>
-          <li v-if="selectedRules !== 'american'">🎯 Deve capturar o máximo de peças possível</li>
-          <li v-else>🎯 Capturas são obrigatórias (escolha livre)</li>
-          <li>Alcance o outro lado para se tornar uma Dama ♔</li>
-          <li>Vença capturando todas as peças do oponente!</li>
+          <li>{{ t('instructions.clickPiece') }}</li>
+          <li>{{ t('instructions.clickSquare') }}</li>
+          <li>{{ t('instructions.capture') }}</li>
+          <li v-if="selectedRules === 'american'">{{ t('instructions.noCaptureBackward') }}</li>
+          <li v-if="selectedRules !== 'american'">{{ t('instructions.canCaptureBackward') }}</li>
+          <li v-if="selectedRules === 'american'">{{ t('instructions.kingShortMove') }}</li>
+          <li v-if="selectedRules !== 'american'">{{ t('instructions.kingLongMove') }}</li>
+          <li v-if="selectedRules !== 'american'">{{ t('instructions.maxCapture') }}</li>
+          <li v-else>{{ t('instructions.freeCapture') }}</li>
+          <li>{{ t('instructions.becomeKing') }}</li>
+          <li>{{ t('instructions.winCondition') }}</li>
         </ul>
       </div>
     </div>
@@ -69,16 +101,16 @@
     <div v-if="winner" class="modal-overlay" @click="closeModal">
       <div class="modal" @click.stop>
         <div class="modal-content">
-          <h2>🎉 Vitória!</h2>
+          <h2>🎉 {{ t('victory') }}</h2>
           <p class="winner-announcement">
-            O jogador <span :class="winner">{{ winner === 'red' ? 'Vermelho' : 'Preto' }}</span> venceu!
+            {{ winner === 'red' ? t('redPlayer') : t('blackPlayer') }} <span :class="winner">{{ t('won') }}</span>
           </p>
           <div class="modal-buttons">
             <button @click="resetGame" class="btn btn-primary">
-              Jogar Novamente
+              {{ t('playAgain') }}
             </button>
             <button @click="closeModal" class="btn btn-secondary">
-              Fechar
+              {{ t('close') }}
             </button>
           </div>
         </div>
@@ -88,10 +120,12 @@
 </template>
 
 <script>
-import { ref, computed, reactive, triggerRef } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import CheckersBoard from './components/CheckersBoard.vue';
 import RulesMenu from './components/RulesMenu.vue';
 import { CheckersGame } from './game/CheckersGame.js';
+import { CheckersAI } from './game/CheckersAI.js';
+import { useTranslation } from './i18n.js';
 
 export default {
   name: 'App',
@@ -100,24 +134,58 @@ export default {
     RulesMenu
   },
   setup() {
+    const currentLanguage = ref('pt');
     const selectedRules = ref(null);
+    const gameMode = ref('pvp'); // 'pvp' ou 'pvc'
+    const aiDifficulty = ref('medium');
     const game = ref(null);
+    const ai = ref(null);
     const winner = ref(null);
     const forceUpdate = ref(0);
+    const isAITurn = ref(false);
 
-    const handleRulesSelection = (ruleType) => {
-      selectedRules.value = ruleType;
-      game.value = new CheckersGame(ruleType);
+    // Sistema de tradução
+    const t = computed(() => {
+      const { t } = useTranslation(currentLanguage.value);
+      return t;
+    });
+
+    const handleRulesSelection = (config) => {
+      selectedRules.value = config.ruleType;
+      gameMode.value = config.gameMode;
+      aiDifficulty.value = config.aiDifficulty;
+      game.value = new CheckersGame(config.ruleType);
+      
+      if (config.gameMode === 'pvc') {
+        ai.value = new CheckersAI(config.aiDifficulty);
+      }
+      
       forceUpdate.value++;
+    };
+
+    const handleLanguageChange = (lang) => {
+      currentLanguage.value = lang;
     };
 
     const getRuleName = () => {
       const names = {
-        'american': 'American Checkers',
-        'brazilian': 'Damas Brasileiras',
-        'international': 'Damas Internacionais'
+        pt: {
+          'american': 'American Checkers',
+          'brazilian': 'Damas Brasileiras',
+          'international': 'Damas Internacionais'
+        },
+        en: {
+          'american': 'American Checkers',
+          'brazilian': 'Brazilian Draughts',
+          'international': 'International Draughts'
+        },
+        es: {
+          'american': 'Damas Americanas',
+          'brazilian': 'Damas Brasileñas',
+          'international': 'Damas Internacionales'
+        }
       };
-      return names[selectedRules.value] || '';
+      return names[currentLanguage.value]?.[selectedRules.value] || '';
     };
 
     const redPieces = computed(() => {
@@ -147,6 +215,9 @@ export default {
     });
 
     const handleSquareClick = ({ row, col }) => {
+      // Não permite jogadas se for o turno da IA
+      if (isAITurn.value) return;
+      
       const piece = game.value.getPiece(row, col);
 
       // Se há uma peça selecionada, tenta mover
@@ -156,7 +227,6 @@ export default {
         if (result) {
           // Força a reatividade
           forceUpdate.value++;
-          triggerRef(game);
           
           // Verifica vencedor
           const gameWinner = game.value.checkWinner();
@@ -173,7 +243,58 @@ export default {
         if (selected) {
           // Força a reatividade
           forceUpdate.value++;
-          triggerRef(game);
+        }
+      }
+    };
+
+    // Observa mudanças no turno do jogador para acionar a IA
+    watch(() => game.value?.currentPlayer, async (newPlayer) => {
+      if (!game.value || !ai.value || gameMode.value !== 'pvc') return;
+      
+      // Se for o turno do preto e o modo é PvC, a IA joga
+      if (newPlayer === 'black' && !winner.value) {
+        isAITurn.value = true;
+        
+        // Aguarda um pouco para parecer que está "pensando"
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        await makeAIMove();
+        
+        isAITurn.value = false;
+      }
+    });
+
+    const makeAIMove = async () => {
+      if (!game.value || !ai.value) return;
+      
+      const aiMove = ai.value.getBestMove(game.value, 'black');
+      
+      if (!aiMove) {
+        winner.value = 'red'; // IA não tem movimentos
+        return;
+      }
+
+      // Seleciona a peça
+      game.value.selectPiece(aiMove.from.row, aiMove.from.col);
+      forceUpdate.value++;
+      
+      // Aguarda um pouco para mostrar a seleção
+      await nextTick();
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Move a peça
+      const result = game.value.movePiece(aiMove.to.row, aiMove.to.col);
+      forceUpdate.value++;
+      
+      // Verifica se há capturas múltiplas
+      if (result && result.continueCapture) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        await makeAIMove(); // Continua capturando
+      } else {
+        // Verifica vencedor
+        const gameWinner = game.value.checkWinner();
+        if (gameWinner) {
+          winner.value = gameWinner;
         }
       }
     };
@@ -181,15 +302,17 @@ export default {
     const resetGame = () => {
       game.value = new CheckersGame(selectedRules.value);
       winner.value = null;
+      isAITurn.value = false;
       // Força a reatividade
       forceUpdate.value++;
-      triggerRef(game);
     };
 
     const changeRules = () => {
       selectedRules.value = null;
       game.value = null;
+      ai.value = null;
       winner.value = null;
+      isAITurn.value = false;
       forceUpdate.value++;
     };
 
@@ -198,13 +321,18 @@ export default {
     };
 
     return {
+      currentLanguage,
       selectedRules,
+      gameMode,
       game,
       winner,
       forceUpdate,
+      isAITurn,
+      t,
       redPieces,
       blackPieces,
       handleRulesSelection,
+      handleLanguageChange,
       getRuleName,
       handleSquareClick,
       resetGame,
@@ -217,7 +345,10 @@ export default {
 
 <style scoped>
 .app {
-  min-height: 100vh;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
 }
 
@@ -230,16 +361,84 @@ export default {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 .title {
   text-align: center;
   color: #4a3933;
   font-size: 2.5em;
-  margin-bottom: 20px;
+  margin: 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  flex: 1;
+}
+
+.title-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.title-icon {
+  font-size: 1em;
+}
+
+.header-flags {
+  display: flex;
+  gap: 8px;
+  font-size: 0.5em;
+  margin-left: 10px;
+}
+
+.header-flag {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1.2em;
+  border: 2px solid transparent;
+}
+
+.header-flag.flag-br {
+  background: linear-gradient(135deg, #009c3b 0%, #ffdf00 100%);
+  color: #002776;
+}
+
+.header-flag.flag-us {
+  background: linear-gradient(135deg, #b22234 0%, #3c3b6e 100%);
+  color: white;
+}
+
+.header-flag.flag-es {
+  background: linear-gradient(135deg, #c60b1e 0%, #ffc400 100%);
+  color: #c60b1e;
+}
+
+.header-flag:hover {
+  transform: scale(1.15);
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.header-flag.active {
+  opacity: 1;
+  transform: scale(1.2);
+  border-color: white;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .rule-badge {
@@ -479,8 +678,24 @@ export default {
     padding: 15px;
   }
 
+  .game-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .title {
     font-size: 1.8em;
+  }
+
+  .title-main {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-flags {
+    font-size: 0.45em;
+    gap: 6px;
+    margin-left: 0;
   }
 
   .game-info {
