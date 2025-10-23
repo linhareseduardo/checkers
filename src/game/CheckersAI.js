@@ -26,6 +26,29 @@ export class CheckersAI {
   getAllPossibleMoves(game, color) {
     const moves = [];
     
+    // Primeiro, verifica se há capturas obrigatórias
+    const allCaptures = game.getAllPossibleCaptures(color);
+    
+    if (allCaptures.length > 0) {
+      // Se há capturas obrigatórias, retorna apenas elas
+      for (const capture of allCaptures) {
+        const piece = game.getPiece(capture.row, capture.col);
+        for (const move of capture.moves) {
+          moves.push({
+            from: { row: capture.row, col: capture.col },
+            to: { row: move.row, col: move.col },
+            isCapture: move.isCapture,
+            capturedRow: move.capturedRow,
+            capturedCol: move.capturedCol,
+            capturedPieces: move.capturedPieces,
+            piece: piece
+          });
+        }
+      }
+      return moves;
+    }
+    
+    // Se não há capturas obrigatórias, retorna todos os movimentos possíveis
     for (let row = 0; row < game.boardSize; row++) {
       for (let col = 0; col < game.boardSize; col++) {
         const piece = game.getPiece(row, col);
@@ -44,12 +67,6 @@ export class CheckersAI {
           }
         }
       }
-    }
-    
-    // Verifica se há capturas obrigatórias
-    const captures = moves.filter(m => m.isCapture);
-    if (captures.length > 0) {
-      return captures;
     }
     
     return moves;

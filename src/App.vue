@@ -67,6 +67,7 @@
         :boardSize="game.boardSize"
         :selectedSquare="game.selectedPiece"
         :validMoves="game.validMoves"
+        :mustCapturePieces="mustCapturePieces"
         @square-click="handleSquareClick"
       />
 
@@ -214,6 +215,13 @@ export default {
       return count;
     });
 
+    const mustCapturePieces = computed(() => {
+      if (!game.value) return [];
+      forceUpdate.value; // Depende do forceUpdate
+      const captures = game.value.getAllPossibleCaptures(game.value.currentPlayer);
+      return captures.map(c => ({ row: c.row, col: c.col }));
+    });
+
     const handleSquareClick = ({ row, col }) => {
       // Não permite jogadas se for o turno da IA
       if (isAITurn.value) return;
@@ -331,6 +339,7 @@ export default {
       t,
       redPieces,
       blackPieces,
+      mustCapturePieces,
       handleRulesSelection,
       handleLanguageChange,
       getRuleName,

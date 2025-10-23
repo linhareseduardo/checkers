@@ -25,7 +25,8 @@
             :class="{
               'red': getPiece(row - 1, col - 1).color === 'red',
               'black': getPiece(row - 1, col - 1).color === 'black',
-              'king': getPiece(row - 1, col - 1).isKing
+              'king': getPiece(row - 1, col - 1).isKing,
+              'must-capture': isMustCapture(row - 1, col - 1)
             }"
           >
             <span v-if="getPiece(row - 1, col - 1).isKing" class="crown">♔</span>
@@ -55,6 +56,10 @@ export default {
     validMoves: {
       type: Array,
       default: () => []
+    },
+    mustCapturePieces: {
+      type: Array,
+      default: () => []
     }
   },
   emits: ['square-click'],
@@ -75,6 +80,9 @@ export default {
     },
     isHighlighted(row, col) {
       return this.isSelected(row, col) || this.isValidMove(row, col);
+    },
+    isMustCapture(row, col) {
+      return this.mustCapturePieces.some(piece => piece.row === row && piece.col === col);
     },
     handleSquareClick(row, col) {
       this.$emit('square-click', { row, col });
@@ -190,6 +198,23 @@ export default {
 .piece.king {
   border: 3px solid gold;
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.piece.must-capture {
+  animation: pulse 1.5s ease-in-out infinite;
+  border: 3px solid #00ff00;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 255, 0, 1);
+    transform: scale(1.05);
+  }
 }
 
 .board-8 .crown {
