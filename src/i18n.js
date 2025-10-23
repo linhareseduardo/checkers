@@ -25,6 +25,7 @@ export const translations = {
     easy: 'Fácil',
     medium: 'Médio',
     hard: 'Difícil',
+    expert: 'Expert',
     
     // Jogo
     checkersGame: 'Jogo de Damas',
@@ -87,6 +88,7 @@ export const translations = {
     easy: 'Easy',
     medium: 'Medium',
     hard: 'Hard',
+    expert: 'Expert',
     
     // Game
     checkersGame: 'Checkers Game',
@@ -149,6 +151,7 @@ export const translations = {
     easy: 'Fácil',
     medium: 'Medio',
     hard: 'Difícil',
+    expert: 'Experto',
     
     // Juego
     checkersGame: 'Juego de Damas',

@@ -71,6 +71,13 @@
             >
               😈 {{ t('hard') }}
             </button>
+            <button 
+              class="diff-btn expert"
+              :class="{ 'active': aiDifficulty === 'expert' }"
+              @click="aiDifficulty = 'expert'"
+            >
+              🧠 {{ t('expert') }}
+            </button>
           </div>
         </div>
       </div>
@@ -391,6 +398,21 @@ export default {
 
 .diff-btn.hard {
   background: linear-gradient(135deg, #c31432, #240b36);
+}
+
+.diff-btn.expert {
+  background: linear-gradient(135deg, #4a00e0, #8e2de2);
+  border: 2px solid gold;
+  animation: expertGlow 2s ease-in-out infinite;
+}
+
+@keyframes expertGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(138, 45, 226, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(138, 45, 226, 1);
+  }
 }
 
 .diff-btn:hover {
