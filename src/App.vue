@@ -102,10 +102,18 @@
     <div v-if="winner" class="modal-overlay" @click="closeModal">
       <div class="modal" @click.stop>
         <div class="modal-content">
-          <h2>🎉 {{ t('victory') }}</h2>
-          <p class="winner-announcement">
-            {{ winner === 'red' ? t('redPlayer') : t('blackPlayer') }} <span :class="winner">{{ t('won') }}</span>
-          </p>
+          <div v-if="winner === 'black' && gameMode === 'pvc'">
+            <h2>😢 Derrota</h2>
+            <p class="winner-announcement">
+              O computador venceu.
+            </p>
+          </div>
+          <div v-else>
+            <h2>🎉 {{ t('victory') }}</h2>
+            <p class="winner-announcement">
+              {{ winner === 'red' ? t('redPlayer') : t('blackPlayer') }} <span :class="winner">{{ t('won') }}</span>
+            </p>
+          </div>
           <div class="modal-buttons">
             <button @click="resetGame" class="btn btn-primary">
               {{ t('playAgain') }}
